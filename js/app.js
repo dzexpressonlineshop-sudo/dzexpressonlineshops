@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>جاري تحميل المنتجات... ⏳</p>";
 
-  // الرابط الخاص بك مع تحديد ورقة Products
+  // جلب المنتجات من ورقة Products عبر SheetDB
   const url = "https://sheetdb.io/api/v1/u2bi74veb32hq?sheet=Products";
 
   fetch(url)
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       productGrid.innerHTML = "";
       
       if (!products || products.length === 0 || products.error) {
-        productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>لا توجد منتجات معروضة حالياً. يرجى إضافتها في ورقة Products داخل Google Sheet.</p>";
+        productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>لا توجد منتجات معروضة حالياً. يرجى إضافتها في ورقة Products داخل قوقل شيت.</p>";
         return;
       }
 
@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.className = "product-card";
         
-        // التحقق من وجود الصورة
         const imageHtml = product.image 
           ? `<img src="${product.image}" alt="${product.name}" class="product-img">`
           : `<div class="product-img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>`;
@@ -42,6 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(error => {
       console.error("Error fetching products:", error);
-      productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>حدث خطأ أثناء تحميل المنتجات. تأكد من وجود ورقة Products في الـ Sheet.</p>";
+      productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>حدث خطأ أثناء تحميل المنتجات.</p>";
     });
 });
