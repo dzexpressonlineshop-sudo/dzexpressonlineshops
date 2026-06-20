@@ -1,53 +1,62 @@
-/* ====================================================================
-   Code.gs
-   هذا الكود يُلصق داخل Google Apps Script (شرح الخطوات في README.md)
-   وظيفته: استقبال الطلبيات من الموقع وتسجيلها في Google Sheet تلقائياً
-==================================================================== */
-
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Orders');
-
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Products");
+  
+  // إذا لم تكن ورقة المنتجات موجودة
   if (!sheet) {
-    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Orders');
+    return ContentService.createTextOutput(JSON.stringify({error: "Products sheet not found"}))
+                         .setMimeType(ContentService.MimeType.JSON);
   }
-
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
-      'تاريخ الطلب',
-      'رقم الطلب',
-      'المنتج',
-      'سعر المنتج',
-      'الولاية',
-      'نوع التوصيل',
-      'سعر التوصيل',
-      'المجموع الكلي',
-      'اسم الزبون',
-      'رقم الهاتف'
-    ]);
+  
+  var data = sheet.getDataRange().getValues();
+  var products = [];
+  
+  // قراءة البيانات وتحويلها إلى JSON (تخطي السطر الأول للعناوين)
+  for (var i = 1; i < data.length; i++) {
+    products.push({
+      id: data[i][0],
+      name: data[i][1],
+      price: Number(data[i][2]),
+      description: data[i][3],
+      image: data[i][4] || ""
+    });
   }
-
-  var data = JSON.parse(e.postData.contents);
-
-  sheet.appendRow([
-    new Date(),
-    data.orderId,
-    data.productName,
-    data.productPrice,
-    data.wilaya,
-    data.deliveryType,
-    data.deliveryPrice,
-    data.total,
-    data.customerName,
-    data.phone
-  ]);
-
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  
+  return ContentService.createTextOutput(JSON.stringify(products))
+                       .setMimeType(ContentService.MimeType.JSON);
 }
 
-function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'الخدمة تعمل بنجاح ✅' }))
-    .setMimeType(ContentService.MimeType.JSON);
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    // التأكد من وجود ورقة Orders أو إنشائها
+    var sheet = ss.getSheetByName("Orders") || ss.insertSheet("Orders");
+    
+    // إذا كانت الورقة جديدة، نكتب العناوين
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["ID الطلب", "التاريخ", "الاسم", "الهاتف", "الولاية", "المنتج", "المجموع"]);
+    }
+    
+    var data = JSON.parse(e.postData.contents);
+    
+    var orderId = "DZ-" + Math.floor(100000 + Math.random() * 900000);
+    var date = new Date().toLocaleString("fr-FR", { timeZone: "Africa/Algiers" });
+    
+    sheet.appendRow([
+      orderId,
+      date,
+      data.custName,
+      data.custPhone,
+      data.custWilaya,
+      data.productName,
+      data.totalGrand + " دج"
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({ success: true, orderId: orderId }))
+                         .setMimeType(ContentService.MimeType.JSON);
+                         
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
+                         .setMimeType(ContentService.MimeType.JSON);
+  }
 }
