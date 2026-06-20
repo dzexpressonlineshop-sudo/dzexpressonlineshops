@@ -9,7 +9,24 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 1. جلب بيانات المنتج المحدد من ورقة Products عبر SheetDB
+  // 1. ملء قائمة الولايات مباشرة عند تحميل الصفحة لتفادي مشكلة الاختفاء
+  const wilayaSelect = document.getElementById("custWilaya");
+  const deliveryArea = document.getElementById("deliveryArea");
+  const totalBox = document.getElementById("totalBox");
+  const orderForm = document.getElementById("orderForm");
+
+  if (typeof wilayas !== 'undefined' && wilayaSelect) {
+    // إفراغ القائمة أولاً لتجنب التكرار
+    wilayaSelect.innerHTML = '<option value="">اختر ولايتك</option>';
+    wilayas.forEach(w => {
+      const opt = document.createElement("option");
+      opt.value = w.id;
+      opt.textContent = `${w.id} - ${w.name}`;
+      wilayaSelect.appendChild(opt);
+    });
+  }
+
+  // 2. جلب بيانات المنتج من ورقة Products عبر SheetDB
   fetch("https://sheetdb.io/api/v1/u2bi74veb32hq?sheet=Products")
     .then(res => res.json())
     .then(products => {
@@ -21,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // عرض ملخص المنتج في الهيكل والديزاين الحالي للموقع دون أي تغيير
+      // عرض ملخص المنتج بالهيكل الأصلي
       const summaryCard = document.getElementById("productSummary");
       if (summaryCard) {
         const imageHtml = currentProduct.image 
@@ -43,23 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(err => {
       console.error("Error loading product:", err);
-      alert("حدث خطأ أثناء تحميل بيانات المنتج.");
     });
 
-  const wilayaSelect = document.getElementById("custWilaya");
-  const deliveryArea = document.getElementById("deliveryArea");
-  const totalBox = document.getElementById("totalBox");
-  const orderForm = document.getElementById("orderForm");
-
-  if (typeof wilayas !== 'undefined' && wilayaSelect) {
-    wilayas.forEach(w => {
-      const opt = document.createElement("option");
-      opt.value = w.id;
-      opt.textContent = `${w.id} - ${w.name}`;
-      wilayaSelect.appendChild(opt);
-    });
-  }
-
+  // عند تغيير الولاية
   if (wilayaSelect) {
     wilayaSelect.addEventListener("change", () => {
       const wilayaId = wilayaSelect.value;
@@ -104,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       deliveryPrice = deliveryType === "home" ? selectedWilaya.home_price : selectedWilaya.desk_price;
     }
 
-    const productPrice = Number(currentProduct.price);
+    const productPrice = Number(currentProduct.price) || 0;
     const grandTotal = productPrice + deliveryPrice;
 
     document.getElementById("totalProduct").textContent = `${productPrice} دج`;
@@ -112,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("totalGrand").textContent = `${grandTotal} دج`;
   }
 
+  // إرسال الطلب
   if (orderForm) {
     orderForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -141,9 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       submitBtn.disabled = true;
       submitLabel.textContent = "جاري إرسال الطلب...⏳";
-      submitError.classList.add("hidden");
 
-      // تجهيز البيانات بصيغة مصفوفة متوافقة تماماً مع شيت الطلبيات الافتراضي (Orders) عبر SheetDB
       const orderData = {
         data: [
           {
@@ -158,8 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ]
       };
 
-      // إرسال الطلبية إلى SheetDB للورقة الافتراضية الأولى (Orders)
-      fetch("https://sheetdb.io/api/v1/u2bi74veb32hq", {
+      // هنا أضفنا تحديث لإرسال البيانات لورقة الطلبيات الأساسية (التبويب الأول في الشيت)
+      fetch("https://sheetdb.io/api/v1/u2bi74veb32hq?sheet=Sheet1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData)
@@ -170,11 +172,11 @@ document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("orderView").classList.add("hidden");
           document.getElementById("successView").classList.remove("hidden");
         } else {
-          throw new Error("فشل التسجيل");
+          throw new Error();
         }
       })
       .catch(err => {
-        console.error("Submit error:", err);
+        console.error(err);
         submitBtn.disabled = false;
         submitLabel.textContent = "تأكيد الطلبية";
         submitError.classList.remove("hidden");
