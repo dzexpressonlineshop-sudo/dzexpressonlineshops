@@ -1,12 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const productGrid = document.getElementById("productGrid");
-  
   if (!productGrid) return;
 
-  productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>جاري تحميل المنتجات...</p>";
+  productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>جاري تحميل المنتجات... ⏳</p>";
 
-  // جلب رابط السكريبت من الإعدادات
-  const url = CONFIG.APPS_SCRIPT_URL;
+  // الرابط الخاص بك مع تحديد ورقة Products
+  const url = "https://sheetdb.io/api/v1/u2bi74veb32hq?sheet=Products";
 
   fetch(url)
     .then(response => response.json())
@@ -14,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       productGrid.innerHTML = "";
       
       if (!products || products.length === 0 || products.error) {
-        productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>لا توجد منتجات معروضة حالياً.</p>";
+        productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>لا توجد منتجات معروضة حالياً. يرجى إضافتها في ورقة Products داخل Google Sheet.</p>";
         return;
       }
 
@@ -31,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ${imageHtml}
           <div class="product-info">
             <h3 class="product-title">${product.name}</h3>
-            <p class="product-desc">${product.description}</p>
+            <p class="product-desc">${product.description || ''}</p>
             <div class="product-meta">
               <span class="product-price">${product.price} دج</span>
               <a href="order.html?id=${product.id}" class="btn btn-gold btn-sm">اطلب الآن</a>
@@ -43,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(error => {
       console.error("Error fetching products:", error);
-      productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>حدث خطأ أثناء تحميل المنتجات. يرجى إعادة المحاولة.</p>";
+      productGrid.innerHTML = "<p style='text-align:center; width:100%; grid-column:1/-1;'>حدث خطأ أثناء تحميل المنتجات. تأكد من وجود ورقة Products في الـ Sheet.</p>";
     });
 });
-document.addEventListener('DOMContentLoaded', renderProducts);
