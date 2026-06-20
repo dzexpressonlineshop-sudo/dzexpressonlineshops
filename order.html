@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إتمام الطلب — DZ Express Online Shop</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.png" alt="DZ Express Online Shop">
+      <div class="brand-text">
+        <span class="name">DZ Express</span>
+        <span class="tag">Online Shop</span>
+      </div>
+    </a>
+    <div class="header-badge">🚚 توصيل لـ 58 ولاية</div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <a href="index.html" class="back-link">→ رجوع للمنتجات</a>
+
+    <div class="order-wrap" id="orderView">
+
+      <div class="summary-card" id="productSummary"></div>
+
+      <form class="form-card" id="orderForm" novalidate>
+
+        <div class="field" id="fieldName">
+          <label for="custName">الاسم الكامل</label>
+          <input type="text" id="custName" placeholder="مثال: أحمد بن علي" autocomplete="name">
+          <span class="error">المرجو إدخال الاسم</span>
+        </div>
+
+        <div class="field" id="fieldPhone">
+          <label for="custPhone">رقم الهاتف</label>
+          <input type="tel" id="custPhone" placeholder="مثال: 0555123456" inputmode="numeric" autocomplete="tel">
+          <span class="error">المرجو إدخال رقم هاتف صحيح (9 أو 10 أرقام)</span>
+        </div>
+
+        <div class="field" id="fieldWilaya">
+          <label for="custWilaya">الولاية</label>
+          <select id="custWilaya">
+            <option value="">اختر ولايتك</option>
+          </select>
+          <span class="error">المرجو اختيار الولاية</span>
+        </div>
+
+        <div class="field" id="fieldDelivery">
+          <label>طريقة التوصيل</label>
+          <div id="deliveryArea">
+            <span class="hint">اختر الولاية أولاً ليظهر لك سعر التوصيل</span>
+          </div>
+          <span class="error">المرجو اختيار طريقة التوصيل</span>
+        </div>
+
+        <div class="total-box" id="totalBox" style="display:none;">
+          <div class="total-row">
+            <span>سعر المنتج</span>
+            <span id="totalProduct">0 دج</span>
+          </div>
+          <div class="total-row">
+            <span>سعر التوصيل</span>
+            <span id="totalDelivery">0 دج</span>
+          </div>
+          <div class="total-row grand">
+            <span>المجموع الكلي</span>
+            <span id="totalGrand">0 دج</span>
+          </div>
+        </div>
+
+        <div id="submitError" class="submit-error hidden">حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى.</div>
+
+        <button type="submit" class="btn btn-gold btn-block" id="submitBtn">
+          <span id="submitLabel">تأكيد الطلبية</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="order-wrap hidden" id="successView">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2>تم استلام طلبك بنجاح!</h2>
+        <p>سيتصل بك فريقنا قريباً لتأكيد الطلبية وموعد التوصيل.</p>
+        <div class="order-id" id="orderIdDisplay"></div>
+        <br>
+        <a href="index.html" class="btn btn-gold">العودة للمتجر</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    جميع الحقوق محفوظة &copy; <strong>DZ Express Online Shop</strong> — توصيل سريع وآمن لكل الجزائر
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/wilayas.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/order.js"></script>
+</body>
+</html>
